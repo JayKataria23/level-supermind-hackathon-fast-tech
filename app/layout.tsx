@@ -46,8 +46,12 @@ export default function RootLayout({
                     <Link href={"/"}>Level Supermind</Link>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant={"link"}>Features</Button>
-                    <Button variant={"link"}>Contact</Button>
+                    <Link href="#features">
+                      <Button variant={"link"}>Features</Button>
+                    </Link>
+                    <Link href="#contact">
+                      <Button variant={"link"}>Contact</Button>
+                    </Link>
                   </div>
                   {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
                 </div>
@@ -56,22 +60,30 @@ export default function RootLayout({
                 {children}
               </div>
 
-              <footer className="w-full border-t bg-background">
+              <footer className="w-full border-t bg-background" id="contact">
                 <div className="max-w-5xl mx-auto py-16 px-5">
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* Column 1 - Logo & Tagline */}
                     <div className="space-y-4">
                       <div className="text-2xl font-bold">Level Supermind</div>
-                      <p className="text-sm text-gray-500">Track Smarter, Learn Better</p>
+                      <p className="text-sm text-gray-500">
+                        Track Smarter, Learn Better
+                      </p>
                     </div>
 
                     {/* Column 2 - Quick Links */}
                     <div>
                       <h3 className="font-semibold mb-4">Quick Links</h3>
                       <ul className="space-y-2 text-sm text-gray-500">
-                        <li><Link href="/features">Features</Link></li>
-                        <li><Link href="/team">Team</Link></li>
-                        <li><Link href="/contact">Contact</Link></li>
+                        <li>
+                          <Link href="/features">Features</Link>
+                        </li>
+                        <li>
+                          <Link href="/team">Team</Link>
+                        </li>
+                        <li>
+                          <Link href="/contact">Contact</Link>
+                        </li>
                       </ul>
                     </div>
 
@@ -79,10 +91,16 @@ export default function RootLayout({
                     <div>
                       <h3 className="font-semibold mb-4">Contact</h3>
                       <div className="space-y-2 text-sm text-gray-500">
-                        <a href="mailto:jaykataria2004@gmail.com" className="block hover:underline">
+                        <a
+                          href="mailto:jaykataria2004@gmail.com"
+                          className="block hover:underline"
+                        >
                           jaykataria2004@gmail.com
                         </a>
-                        <a href="mailto:sisha200316@gmail.com" className="block hover:underline">
+                        <a
+                          href="mailto:sisha200316@gmail.com"
+                          className="block hover:underline"
+                        >
                           sisha200316@gmail.com
                         </a>
                       </div>
@@ -91,26 +109,38 @@ export default function RootLayout({
                     {/* Column 4 - Newsletter */}
                     <div>
                       <h3 className="font-semibold mb-4">Stay Updated</h3>
-                      <p className="text-sm text-gray-500 mb-4">Subscribe to our newsletter</p>
+                      <p className="text-sm text-gray-500 mb-4">
+                        Subscribe to our newsletter
+                      </p>
                       <div className="flex gap-2">
-                        <input 
-                          type="email" 
-                          placeholder="Enter your email" 
+                        <input
+                          type="email"
+                          placeholder="Enter your email"
                           className="text-sm px-3 py-2 border rounded-md flex-1 bg-background"
                         />
-                        <Button>
-                          Subscribe
-                        </Button>
+                        <Button>Subscribe</Button>
                       </div>
                     </div>
                   </div>
 
                   {/* Bottom Section */}
                   <div className="flex flex-col md:flex-row justify-between items-center mt-16 pt-8 border-t border-gray-800">
-                    <p className="text-sm text-gray-500">© 2025 Level Supermind. All rights reserved.</p>
+                    <p className="text-sm text-gray-500">
+                      © 2025 Level Supermind. All rights reserved.
+                    </p>
                     <div className="flex items-center gap-6 mt-4 md:mt-0">
-                      <Link href="/privacy" className="text-sm text-gray-500 hover:underline">Privacy Policy</Link>
-                      <Link href="/terms" className="text-sm text-gray-500 hover:underline">Terms of Service</Link>
+                      <Link
+                        href="/privacy"
+                        className="text-sm text-gray-500 hover:underline"
+                      >
+                        Privacy Policy
+                      </Link>
+                      <Link
+                        href="/terms"
+                        className="text-sm text-gray-500 hover:underline"
+                      >
+                        Terms of Service
+                      </Link>
                       <ThemeSwitcher />
                     </div>
                   </div>
