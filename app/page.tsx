@@ -1,7 +1,5 @@
-"use client";
-
 import Hero from "@/components/hero";
-import { useEffect } from "react";
+
 export default async function Home() {
   return (
     <>
