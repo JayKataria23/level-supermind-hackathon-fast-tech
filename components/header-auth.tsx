@@ -15,7 +15,7 @@ export default async function AuthButton() {
   if (!hasEnvVars) {
     return (
       <>
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center ">
           <div>
             <Badge
               variant={"default"}
@@ -27,19 +27,19 @@ export default async function AuthButton() {
           <div className="flex gap-2">
             <Button
               asChild
-              size="sm"
               variant={"outline"}
               disabled
-              className="opacity-75 cursor-none pointer-events-none"
+              className="opacity-75 cursor-none pointer-events-none text-xl"
             >
-              <Link href="/sign-in">Sign in</Link>
+              <Link className="" href="/sign-in">
+                Sign in
+              </Link>
             </Button>
             <Button
               asChild
-              size="sm"
               variant={"default"}
               disabled
-              className="opacity-75 cursor-none pointer-events-none"
+              className="opacity-75 cursor-none pointer-events-none text-xl "
             >
               <Link href="/sign-up">Sign up</Link>
             </Button>
@@ -49,7 +49,7 @@ export default async function AuthButton() {
     );
   }
   return user ? (
-    <div className="flex items-center gap-4 text-sm">
+    <div className="flex items-center gap-4 text-xl">
       Hey, {user.email}!
       <form action={signOutAction}>
         <Button type="submit" variant={"outline"}>
@@ -59,10 +59,10 @@ export default async function AuthButton() {
     </div>
   ) : (
     <div className="flex gap-2">
-      <Button asChild size="sm" variant={"outline"}>
+      <Button asChild size="sm" variant={"outline"} className="text-xl">
         <Link href="/sign-in">Sign in</Link>
       </Button>
-      <Button asChild size="sm" variant={"default"}>
+      <Button asChild size="sm" variant={"default"} className="text-xl">
         <Link href="/sign-up">Sign up</Link>
       </Button>
     </div>

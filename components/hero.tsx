@@ -60,7 +60,7 @@ export default function Header() {
       <div className="container relative mx-auto">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-0">
           <div className="flex-0 lg:text-left space-y-8">
-            <div className="inline-block bg-primary/5 text-primary font-bold py-2 px-6 rounded-full animate-pulse">
+            <div className="inline-block bg-primary/20 text-primary font-bold py-2 px-6 rounded-full animate-pulse">
               AI Powered
             </div>
             <div className="flex justify-center w-full max-w-xl">
@@ -87,7 +87,7 @@ export default function Header() {
             <div className="w-full max-w-md">
               <Link href="/protected/FormPage">
               <Button
-                className="mt-4 w-full bg-primary hover:bg-primary/90 text-black"
+                className="mt-4 w-full bg-primary hover:bg-primary/90 text-white text-xl"
                 size="lg"
               >
                 Analyze Now <ArrowRight className="ml-2" />

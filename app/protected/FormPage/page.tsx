@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Plus, Loader2, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm, FormProvider } from "react-hook-form";
 
@@ -52,7 +52,6 @@ export default function CompanyDashboard() {
     },
   });
 
-  // Simulate initial data loading
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsPageLoading(false);
@@ -75,13 +74,10 @@ export default function CompanyDashboard() {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      // Combine form data with industries
       const formData = {
         ...data,
         industries: industries,
       };
-
-      // Redirect to results page with form data
       router.push(
         `/protected/results?data=${encodeURIComponent(JSON.stringify(formData))}`
       );
@@ -94,10 +90,10 @@ export default function CompanyDashboard() {
 
   if (isPageLoading) {
     return (
-      <div className="min-h-screen bg-black text-white">
-        <header className="border-b border-purple-900">
+      <div className="min-h-screen bg-[#13111C]">
+        <header className="border-b border-[#2D2B3B]">
           <div className="container mx-auto px-4 py-4">
-            <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         </header>
         <main className="container mx-auto px-4 py-8">
@@ -108,20 +104,28 @@ export default function CompanyDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <main className="container mx-auto px-4 py-8">
+    <div className="min-h-screen  text-white relative overflow-hidden">
+      
+
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-6xl mx-auto space-y-8">
-          <div className="space-y-2">
-            <h2 className="text-4xl font-bold">Welcome to ART Finder!</h2>
-            <p className="text-gray-400">
+          <div className="space-y-4">
+            <div className="inline-flex items-center px-3 py-1 rounded-full  text-primary text-sm font-medium mb-4">
+              AI Powered
+            </div>
+            <h2 className="text-5xl font-bold tracking-tight">
+              Data Driven Ads,{" "}
+              <span className="text-primary">Done Right</span>
+            </h2>
+            <p className="text-gray-400 text-lg">
               Complete your company profile to get personalized ad
               recommendations.
             </p>
           </div>
 
-          <Card className="bg-gray-900 border-purple-900">
-            <CardContent className="p-6">
-              <div className="space-y-6">
+          <Card className=" border-[#2D2B3B] ">
+            <CardContent className="p-8">
+              <div className="space-y-8">
                 <div>
                   <h3 className="text-2xl font-semibold mb-2">
                     Company Profile
@@ -135,27 +139,27 @@ export default function CompanyDashboard() {
                 <FormProvider {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-6"
+                    className="space-y-8"
                   >
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <FormField
                         control={form.control}
                         name="companyName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>
+                            <FormLabel className="text-gray-200">
                               Company Name{" "}
-                              <span className="text-red-500">*</span>
+                              <span className="text-primary">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
-                                className="bg-gray-800 border-purple-900"
+                                className="bg-[#13111C] border-[#2D2B3B] focus:border-[#8B5CF6] transition-colors"
                                 placeholder="Enter your company name"
                                 required
                               />
                             </FormControl>
-                            <FormDescription>
+                            <FormDescription className="text-gray-500">
                               This will be displayed on your public profile
                             </FormDescription>
                           </FormItem>
@@ -163,20 +167,21 @@ export default function CompanyDashboard() {
                       />
 
                       <FormItem>
-                        <FormLabel>
-                          Industry <span className="text-red-500">*</span>
+                        <FormLabel className="text-gray-200">
+                          Industry <span className="text-primary">*</span>
                         </FormLabel>
                         <div className="flex gap-2">
                           <Input
                             value={currentIndustry}
                             onChange={(e) => setCurrentIndustry(e.target.value)}
                             onKeyDown={handleIndustryKeyDown}
-                            className="bg-gray-800 border-purple-900"
+                            className="bg-[#13111C] border-[#2D2B3B] focus:border-primary transition-colors"
                             placeholder="Type and press Enter to add industries"
                           />
                           <Button
                             type="button"
                             variant="outline"
+                            className="border-[#2D2B3B] hover:bg-primary/10 hover:text-primary"
                             onClick={() => {
                               if (currentIndustry.trim()) {
                                 setIndustries([
@@ -195,7 +200,7 @@ export default function CompanyDashboard() {
                             <Badge
                               key={industry}
                               variant="secondary"
-                              className="cursor-pointer hover:bg-purple-900/50"
+                              className="bg-primary/10 hover:bg-primary/20 text-primary cursor-pointer transition-colors"
                               onClick={() => removeIndustry(industry)}
                             >
                               {industry} ×
@@ -203,7 +208,7 @@ export default function CompanyDashboard() {
                           ))}
                         </div>
                         {industries.length === 0 && (
-                          <FormMessage className="text-yellow-500">
+                          <FormMessage className="text-primary">
                             <AlertCircle className="h-4 w-4 inline mr-1" />
                             Add at least one industry
                           </FormMessage>
@@ -215,19 +220,19 @@ export default function CompanyDashboard() {
                         name="companyDescription"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>
+                            <FormLabel className="text-gray-200">
                               Company Description{" "}
-                              <span className="text-red-500">*</span>
+                              <span className="text-primary">*</span>
                             </FormLabel>
                             <FormControl>
                               <Textarea
                                 {...field}
-                                className="bg-gray-800 border-purple-900 min-h-[120px]"
+                                className="bg-[#13111C] border-[#2D2B3B] focus:border-primary transition-colors min-h-[120px]"
                                 placeholder="Describe your company and its main activities"
                                 required
                               />
                             </FormControl>
-                            <FormDescription>
+                            <FormDescription className="text-gray-500">
                               Provide a clear description to help us understand
                               your business better
                             </FormDescription>
@@ -235,21 +240,23 @@ export default function CompanyDashboard() {
                         )}
                       />
 
-                      <div className="grid md:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <FormField
                           control={form.control}
                           name="targetAge"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Target Audience Age</FormLabel>
+                              <FormLabel className="text-gray-200">
+                                Target Audience Age
+                              </FormLabel>
                               <Select
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
-                                <SelectTrigger className="bg-gray-800 border-purple-900">
+                                <SelectTrigger className="bg-[#13111C] border-[#2D2B3B] focus:border-primary transition-colors">
                                   <SelectValue placeholder="Select age range" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-[#1A1825] border-[#2D2B3B]">
                                   <SelectItem value="13-17">13-17</SelectItem>
                                   <SelectItem value="18-24">18-24</SelectItem>
                                   <SelectItem value="25-34">25-34</SelectItem>
@@ -266,15 +273,17 @@ export default function CompanyDashboard() {
                           name="targetGender"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Target Gender</FormLabel>
+                              <FormLabel className="text-gray-200">
+                                Target Gender
+                              </FormLabel>
                               <Select
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
-                                <SelectTrigger className="bg-gray-800 border-purple-900">
+                                <SelectTrigger className="bg-[#13111C] border-[#2D2B3B] focus:border-primary transition-colors">
                                   <SelectValue placeholder="Select gender" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-[#1A1825] border-[#2D2B3B]">
                                   <SelectItem value="all">All</SelectItem>
                                   <SelectItem value="male">Male</SelectItem>
                                   <SelectItem value="female">Female</SelectItem>
@@ -289,15 +298,17 @@ export default function CompanyDashboard() {
                           name="targetCountry"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Target Country</FormLabel>
+                              <FormLabel className="text-gray-200">
+                                Target Country
+                              </FormLabel>
                               <Select
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
-                                <SelectTrigger className="bg-gray-800 border-purple-900">
+                                <SelectTrigger className="bg-[#13111C] border-[#2D2B3B] focus:border-primary transition-colors">
                                   <SelectValue placeholder="Select country" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-[#1A1825] border-[#2D2B3B]">
                                   <SelectItem value="us">
                                     United States
                                   </SelectItem>
@@ -317,7 +328,7 @@ export default function CompanyDashboard() {
 
                     <Button
                       type="submit"
-                      className="w-full bg-purple-600 hover:bg-purple-900"
+                        className="w-full bg-primary hover:bg-primary/90 transition-colors text-xl  "
                       disabled={isLoading || industries.length === 0}
                     >
                       {isLoading ? (
@@ -326,7 +337,7 @@ export default function CompanyDashboard() {
                           Updating Profile...
                         </>
                       ) : (
-                        "Submit"
+                        "Analyze Now"
                       )}
                     </Button>
                   </form>
