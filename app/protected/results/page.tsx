@@ -1,5 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
+import Markdown from "react-markdown";
+
 
 function Page() {
   const [painPoints, setPainPoints] = useState<string>("");
@@ -14,6 +17,11 @@ function Page() {
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
   const [selectedSection, setSelectedSection] = useState<string>("painPoints");
   const [formData, setFormData] = useState<any>(null);
+  const [tavilyData, setTavilyData] = useState<{
+    ctRdData: any;
+    rdData: any;
+    ytData: any;
+  } | null>(null);
 
   useEffect(() => {
     // Parse the encoded form data from URL
@@ -87,25 +95,10 @@ function Page() {
       const data = await response.json();
 
       // Convert the response to HTML using a simple markdown-like format
-      const formattedResponse = data
-        .split("\n")
-        .map((line: string) => {
-          if (line.startsWith("- ")) {
-            return `<li>${line.substring(2)}</li>`;
-          }
-          if (line.startsWith("# ")) {
-            return `<h1>${line.substring(2)}</h1>`;
-          }
-          if (line.startsWith("## ")) {
-            return `<h2>${line.substring(3)}</h2>`;
-          }
-          return `<p>${line}</p>`;
-        })
-        .join("");
 
       setResponses((prev) => ({
         ...prev,
-        [key]: `<div class="space-y-4">${formattedResponse}</div>`,
+        [key]: data,
       }));
     } catch (error) {
       console.error("Error calling API:", error);
@@ -118,90 +111,274 @@ function Page() {
     }
   };
 
+  const fetchTavilyData = async () => {
+    try {
+      const [ctRdResponse, rdResponse, ytResponse] = await Promise.all([
+        fetch("/api/tavily-ct-rd", {
+          method: "POST",
+          body: JSON.stringify({
+            searchQuery: formData.companyName + " competitors",
+          }),
+        }),
+        fetch("/api/tavily-rd", {
+          method: "POST",
+          body: JSON.stringify({
+            searchQuery: formData.companyName,
+          }),
+        }),
+        fetch("/api/tavily-yt", {
+          method: "POST",
+          body: JSON.stringify({
+            searchQuery: formData.industries.join(", ") + " ads",
+          }),
+        }),
+      ]);
+
+      const [ctRdData, rdData, ytData] = await Promise.all([
+        ctRdResponse.json(),
+        rdResponse.json(),
+        ytResponse.json(),
+      ]);
+
+      setTavilyData({ ctRdData, rdData, ytData });
+      return { ctRdData, rdData, ytData };
+    } catch (error) {
+      console.error("Error fetching Tavily data:", error);
+      return null;
+    }
+  };
+
+  // Add useEffect to fetch Tavily data when company name is available
+  useEffect(() => {
+    if (formData?.companyName) {
+      fetchTavilyData();
+    }
+  }, [formData?.companyName]);
+
   const sections = [
-    { title: "Pain Points", prompt: painPoints, key: "painPoints" },
-    { title: "Triggers", prompt: triggers, key: "triggers" },
-    { title: "Best Hooks", prompt: bestHooks, key: "bestHooks" },
+    { title: "🎯 Pain Points", prompt: painPoints, key: "painPoints" },
+    { title: "⚡ Triggers", prompt: triggers, key: "triggers" },
+    { title: "🎣 Best Hooks", prompt: bestHooks, key: "bestHooks" },
     {
-      title: "Best Call to Actions",
+      title: "🎬 Best Call to Actions",
       prompt: bestCallToActions,
       key: "bestCallToActions",
     },
     {
-      title: "Ad Campaign Ideas",
+      title: "💡 Ad Campaign Ideas",
       prompt: adCampaignIdeas,
       key: "adCampaignIdeas",
     },
-    { title: "Sentiments", prompt: sentiments, key: "sentiments" },
-    { title: "Keywords", prompt: keywords, key: "keywords" },
-    { title: "Target Market", prompt: targetMarket, key: "targetMarket" },
+    { title: "💭 Sentiments", prompt: sentiments, key: "sentiments" },
+    { title: "🔑 Keywords", prompt: keywords, key: "keywords" },
+    { title: "🎯 Target Market", prompt: targetMarket, key: "targetMarket" },
+    { title: "📚 References", key: "references" },
   ];
+
+  // Add new function to generate word cloud data
+ 
 
   if (!formData) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl">Loading company data...</div>
+      <div className="flex items-center justify-center min-h-screen bg-[#0F0A1F] text-white">
+        <div className="text-xl">⌛ Loading company data...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen">
-      <div className="w-64 bg-gray-100 p-4 border-r min-h-screen">
+    <div className="flex min-h-screen bg-[#0F0A1F] text-white">
+      {/* Sidebar */}
+      <div className="w-72 border-r border-gray-800 p-4">
         {sections.map(({ title, key }) => (
           <div
             key={key}
             onClick={() => setSelectedSection(key)}
-            className={`p-3 cursor-pointer rounded-lg mb-2 ${
+            className={`p-4 cursor-pointer rounded-lg mb-2 transition-all duration-200 ${
               selectedSection === key
-                ? "bg-blue-500 text-white"
-                : "hover:bg-gray-200"
+                ? "bg-[#9333EA] text-white"
+                : "hover:bg-gray-800"
             }`}
           >
-            <span className="flex items-center">
+            <span className="flex items-center justify-between">
               {title}
               {responses[key] && (
-                <span className="ml-2 w-2 h-2 bg-green-500 rounded-full"></span>
+                <span className="w-2 h-2 bg-green-400 rounded-full"></span>
               )}
             </span>
           </div>
         ))}
       </div>
 
+      {/* Main Content */}
       <div className="flex-1 p-8">
         <div className="max-w-4xl mx-auto">
-          {sections
-            .filter(({ key }) => key === selectedSection)
-            .map(({ title, prompt, key }) => (
-              <div
-                key={key}
-                className="border rounded-lg p-6 bg-white shadow-sm"
-              >
-                <h2 className="text-2xl font-bold mb-4">{title}</h2>
-                <div className="mb-6">
-                  {loading[key] ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                      <span className="text-gray-600">
-                        Generating response...
-                      </span>
+          {selectedSection === "references" ? (
+            <div className="border border-gray-800 rounded-xl p-8 bg-gray-900/50 backdrop-blur">
+              <h2 className="text-3xl font-bold mb-6 text-white">References</h2>
+              {tavilyData ? (
+                <div className="space-y-8">
+                  <details className="group" open>
+                    <summary className="cursor-pointer list-none">
+                      <div className="flex items-center text-xl font-semibold mb-4 text-purple-400">
+                        <span>🔍 Competitor & Reddit Research</span>
+                        <svg
+                          className="w-6 h-6 ml-2 transform group-open:rotate-180 transition-transform"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </summary>
+                    <div className="space-y-4 pt-4">
+                      {tavilyData.ctRdData?.map((item: any, index: number) => (
+                        <div
+                          key={index}
+                          className="p-4 bg-gray-800/50 rounded-lg"
+                        >
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:underline"
+                          >
+                            {item.title}
+                          </a>
+                          <p className="text-gray-300 mt-2">{item.content}</p>
+                        </div>
+                      ))}
                     </div>
-                  ) : !responses[key] ? (
-                    <button
-                      onClick={() => handleApiCall(prompt, key)}
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    >
-                      Generate
-                    </button>
-                  ) : null}
+                  </details>
+
+                  <details className="group">
+                    <summary className="cursor-pointer list-none">
+                      <div className="flex items-center text-xl font-semibold mb-4 text-purple-400">
+                        <span>💬 Reddit Discussions</span>
+                        <svg
+                          className="w-6 h-6 ml-2 transform group-open:rotate-180 transition-transform"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </summary>
+                    <div className="space-y-4 pt-4">
+                      {tavilyData.rdData?.map((item: any, index: number) => (
+                        <div
+                          key={index}
+                          className="p-4 bg-gray-800/50 rounded-lg"
+                        >
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:underline"
+                          >
+                            {item.title}
+                          </a>
+                          <p className="text-gray-300 mt-2">{item.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </details>
+
+                  <details className="group">
+                    <summary className="cursor-pointer list-none">
+                      <div className="flex items-center text-xl font-semibold mb-4 text-purple-400">
+                        <span>📺 YouTube Content</span>
+                        <svg
+                          className="w-6 h-6 ml-2 transform group-open:rotate-180 transition-transform"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </summary>
+                    <div className="space-y-4 pt-4">
+                      {tavilyData.ytData?.map((item: any, index: number) => (
+                        <div
+                          key={index}
+                          className="p-4 bg-gray-800/50 rounded-lg"
+                        >
+                          <a
+                            href={item.videoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:underline"
+                          >
+                            {item.title}
+                          </a>
+                          <p className="text-gray-300 mt-2">{item.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </details>
                 </div>
-                {responses[key] && (
-                  <div className="prose max-w-none">
-                    <div dangerouslySetInnerHTML={{ __html: responses[key] }} />
+              ) : (
+                <div className="text-gray-400">Loading references...</div>
+              )}
+            </div>
+          ) : (
+            sections
+              .filter(({ key }) => key === selectedSection)
+              .map(({ title, prompt, key }) => (
+                <div
+                  key={key}
+                  className="border border-gray-800 rounded-xl p-8 bg-gray-900/50 backdrop-blur"
+                >
+                  <h2 className="text-3xl font-bold mb-6 text-white">
+                    {title}
+                  </h2>
+                  <div className="mb-6">
+                    {loading[key] ? (
+                      <div className="flex items-center space-x-3">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#9333EA]"></div>
+                        <span className="text-gray-400">
+                          ✨ Generating insights...
+                        </span>
+                      </div>
+                    ) : !responses[key] ? (
+                      <button
+                        onClick={() => handleApiCall(prompt as string, key)}
+                        className="bg-[#9333EA] hover:bg-[#7928CA] text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center gap-2"
+                      >
+                        Generate Insights
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    ) : null}
                   </div>
-                )}
-              </div>
-            ))}
+                  {responses[key] && (
+                    <div className="prose prose-invert max-w-none">
+                      <div className="text-gray-300 space-y-4">
+                        <Markdown>{responses[key]}</Markdown>
+                      </div>
+                    </div>
+                  )}
+                  
+                </div>
+              ))
+          )}
         </div>
       </div>
     </div>
