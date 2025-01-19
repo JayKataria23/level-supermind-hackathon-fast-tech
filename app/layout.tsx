@@ -7,8 +7,7 @@ import Link from "next/link";
 import "./globals.css";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import logo from "./logo.png";
-
+import favicon from "./favicon.ico";
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
@@ -43,7 +42,7 @@ export default function RootLayout({
               <div className="container flex h-24 items-center justify-between">
                 <div className="flex items-center gap-2 text-4xl">
                   <Image
-                    src={logo || "/placeholder.svg"}
+                    src={favicon || "/placeholder.svg"}
                     alt="Application Logo"
                     width={40}
                     height={40}
