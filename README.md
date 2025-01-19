@@ -25,15 +25,6 @@ ARTFinder addresses the challenge of conducting manual, time-consuming research 
 
 The technology used in ARTFinder was new and exciting, presenting unique challenges that required a deep understanding of the concepts. The tasks were well thought out and demanded critical thinking and problem-solving skills to create a meaningful and successful project. Despite these challenges, we navigated them gracefully and delivered a powerful solution.
 
-## Installation
-
-To get started with ARTFinder, clone the repository and install the required dependencies:
-
-```
-git clone https://github.com/username/ARTFinder.git
-cd ARTFinder
-npm install
-```
 
 ## Usage
 
@@ -45,18 +36,12 @@ npm install
 ## Technologies Used
 
 - Web scraping tools
-- Data analytics frameworks
+- AstraDB
+- Langflow
+- Nextjs
 - Real-time trend monitoring tools
 - Competitive analysis engines
 
-## Contributing
-
-We welcome contributions to enhance ARTFinder! Feel free to fork the repository, submit pull requests, or open issues for any bugs or improvements.
-
-## License
-
-MIT License. See the [LICENSE](LICENSE) file for more details.
-
 ---
 
-Let me know if you'd like to make any adjustments or additions!
+Let us know if you'd like to make any adjustments or additions!
