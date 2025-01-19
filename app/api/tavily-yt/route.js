@@ -1,6 +1,15 @@
 import { YoutubeTranscript } from "youtube-transcript";
 import { NextResponse } from "next/server";
+import { DataAPIClient } from "@datastax/astra-db-ts";
+
+const client = new DataAPIClient({ logging: "all" });
+const db = client.db(process.env.CLIENT_DB_URL, {
+  token: process.env.CLIENT_DB_TOKEN,
+});
+
 export async function POST(req) {
+  const colls = await db.listCollections();
+  console.log("Connected to AstraDB:", colls);
   const { searchQuery } = await req.json();
   async function fetchYouTubeData(videoUrl) {
     let transcript = "";
@@ -60,11 +69,19 @@ export async function POST(req) {
       return {
         videoUrl: videoUrl.url,
         title: videoUrl.title,
-        description: videoUrl.content,
+        $vectorize: videoUrl.content,
         ...videoData,
       };
     })
   );
-    
+
+  try {
+    const collection = await db.collection("youtube_videos");
+    await collection.deleteMany();
+    await collection.insertMany(results);
+  } catch (error) {
+    console.error("Error uploading data to Astra DB:", error);
+  }
+
   return NextResponse.json(results);
 }
