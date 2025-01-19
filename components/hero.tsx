@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { ArrowRight } from "lucide-react";
-
+import Link from "next/link";
 export interface TypingConfig {
   speed: number;
   deleteSpeed: number;
@@ -86,12 +86,14 @@ export default function Header() {
               Your go-to Ad-creation analysis tool
             </p>
             <div className="w-full max-w-md">
+              <Link href="/protected">
               <Button
                 className="mt-4 w-full bg-primary hover:bg-primary/90 text-black"
                 size="lg"
               >
                 Analyze Now <ArrowRight className="ml-2" />
               </Button>
+              </Link>
             </div>
           </div>
         </div>
