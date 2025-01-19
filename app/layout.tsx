@@ -9,15 +9,16 @@ import Link from "next/link";
 import "./globals.css";
 import { Button } from "@/components/ui/button";
 import AnimatedBackground from "@/components/animated-background";
-
+import Image from "next/image";
+import logo from "./logo.png";
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "level-supermind",
-  description: "level-supermind",
+  title: "ART Finder",
+  description: "Your go-to Ad-creation analysis tool",
 };
 
 const geistSans = Geist({
@@ -43,6 +44,9 @@ export default function RootLayout({
             <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
               <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-xl">
                 <div className="flex gap-5 items-center text-2xl font-bold ">
+                  <div className="flex justify-center mb-4">
+                    <Image src={logo} alt="Application Logo" width={64} height={64} />
+                  </div>
                   <Link href={"/"}>ART Finder</Link>
                 </div>
                 <div className="flex items-center gap-2">
