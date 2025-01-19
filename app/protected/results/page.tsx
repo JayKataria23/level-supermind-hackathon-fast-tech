@@ -21,6 +21,8 @@ function Page() {
     rdData: any;
     ytData: any;
   } | null>(null);
+  const [customQuery, setCustomQuery] = useState<string>("");
+  const [customQueryPrompt, setCustomQueryPrompt] = useState<string>("");
 
   useEffect(() => {
     // Parse the encoded form data from URL
@@ -171,6 +173,7 @@ function Page() {
     { title: "💭 Sentiments", prompt: sentiments, key: "sentiments" },
     { title: "🔑 Keywords", prompt: keywords, key: "keywords" },
     { title: "🎯 Target Market", prompt: targetMarket, key: "targetMarket" },
+    { title: "🤔 Custom Query", prompt: customQueryPrompt, key: "customQuery" },
     { title: "📚 References", key: "references" },
   ];
 
@@ -489,6 +492,46 @@ function Page() {
                 </div>
               ) : (
                 <div className="text-gray-400">Loading references...</div>
+              )}
+            </div>
+          ) : selectedSection === "customQuery" ? (
+            <div className="border border-gray-800 rounded-xl p-8 bg-gray-900/50 backdrop-blur">
+              <h2 className="text-3xl font-bold mb-6 text-white">
+                Custom Query
+              </h2>
+              <div className="mb-6">
+                <textarea
+                  value={customQuery}
+                  onChange={(e) => setCustomQuery(e.target.value)}
+                  placeholder="Enter your custom query here..."
+                  className="w-full p-4 bg-gray-800 rounded-lg text-white resize-none min-h-[100px]"
+                />
+                <button
+                  onClick={() => {
+                    setCustomQueryPrompt(customQuery+", Give a 3 point answer which is short and exact.");
+                    handleApiCall(customQuery, "customQuery");
+                  }}
+                  className="mt-4 bg-[#9333EA] hover:bg-[#7928CA] text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center gap-2"
+                >
+                  Generate Response
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+              {loading["customQuery"] ? (
+                <div className="flex items-center space-x-3">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#9333EA]"></div>
+                  <span className="text-gray-400">
+                    ✨ Generating response...
+                  </span>
+                </div>
+              ) : (
+                responses["customQuery"] && (
+                  <div className="prose prose-invert max-w-none">
+                    <div className="text-gray-300 space-y-4">
+                      <Markdown>{responses["customQuery"]}</Markdown>
+                    </div>
+                  </div>
+                )
               )}
             </div>
           ) : (
