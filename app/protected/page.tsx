@@ -236,7 +236,7 @@ export default function CompanyDashboard() {
 
                     <Button 
                       type="submit" 
-                      className="w-full bg-purple-600 hover:bg-purple-700"
+                      className="w-full bg-purple-600 hover:bg-purple-900"
                       disabled={isLoading || industries.length === 0}
                     >
                       {isLoading ? (
@@ -245,7 +245,7 @@ export default function CompanyDashboard() {
                           Updating Profile...
                         </>
                       ) : (
-                        'Update Profile'
+                        'Submit'
                       )}
                     </Button>
                   </form>
