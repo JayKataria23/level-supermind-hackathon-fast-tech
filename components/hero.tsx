@@ -21,7 +21,6 @@ const TYPING_CONFIG: TypingConfig = {
 export default function Header() {
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
 
   useEffect(() => {
@@ -86,7 +85,7 @@ export default function Header() {
               Your go-to Ad-creation analysis tool
             </p>
             <div className="w-full max-w-md">
-              <Link href="/protected">
+              <Link href="/protected/FormPage">
               <Button
                 className="mt-4 w-full bg-primary hover:bg-primary/90 text-black"
                 size="lg"
