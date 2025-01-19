@@ -2,7 +2,6 @@ import Features from "@/components/Features";
 import Hero from "@/components/hero";
 import Team from "@/components/Team";
 import Image from "next/image";
-import logo from "@/public/logo.png";
 export default async function Home() {
   return (
     <>

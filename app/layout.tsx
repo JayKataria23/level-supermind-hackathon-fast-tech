@@ -45,11 +45,11 @@ export default function RootLayout({
               <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-xl">
                 <div className="flex gap-5 items-center text-2xl font-bold ">
                   <div className="flex justify-center mb-4">
-                    <Image src={logo} alt="Application Logo" width={64} height={64} />
+                    <Image src={logo} alt="Application Logo" width={40} height={20} />
                   </div>
                   <Link href={"/"}>ART Finder</Link>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 bg-white-500">
                   <Link href="#features">
                     <Button variant={"link"}>Features</Button>
                   </Link>
