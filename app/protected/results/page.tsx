@@ -2,6 +2,14 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import Markdown from "react-markdown";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
 
 function Page() {
   const [painPoints, setPainPoints] = useState<string>("");
@@ -23,6 +31,33 @@ function Page() {
   } | null>(null);
   const [customQuery, setCustomQuery] = useState<string>("");
   const [customQueryPrompt, setCustomQueryPrompt] = useState<string>("");
+  const [sentimentData, setSentimentData] = useState<any[]>([]);
+
+  // Add these constants for the pie chart
+  const SENTIMENT_COLORS = {
+    Positive: "#4CAF50",
+    Neutral: "#FFC107",
+    Negative: "#F44336",
+  };
+
+  // Add this function to process sentiment data
+  const processSentimentData = (text: string) => {
+    const positiveMatch = text.match(/positive/gi);
+    const negativeMatch = text.match(/negative/gi);
+    const neutralMatch = text.match(/neutral/gi);
+
+    const positive = positiveMatch ? positiveMatch.length : 0;
+    const negative = negativeMatch ? negativeMatch.length : 0;
+    const neutral = neutralMatch ? neutralMatch.length : 0;
+
+    const total = positive + negative + neutral;
+
+    return [
+      { name: "Positive", value: positive || 1 },
+      { name: "Neutral", value: neutral || 1 },
+      { name: "Negative", value: negative || 1 },
+    ];
+  };
 
   useEffect(() => {
     // Parse the encoded form data from URL
@@ -83,7 +118,6 @@ function Page() {
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
-
         body: JSON.stringify({
           message: prompt,
         }),
@@ -95,12 +129,15 @@ function Page() {
 
       const data = await response.json();
 
-      // Convert the response to HTML using a simple markdown-like format
-
       setResponses((prev) => ({
         ...prev,
         [key]: data,
       }));
+
+      // Process sentiment data if this is the sentiments section
+      if (key === "sentiments") {
+        setSentimentData(processSentimentData(data));
+      }
     } catch (error) {
       console.error("Error calling API:", error);
       setResponses((prev) => ({
@@ -508,7 +545,10 @@ function Page() {
                 />
                 <button
                   onClick={() => {
-                    setCustomQueryPrompt(customQuery+", Give a 3 point answer which is short and exact.");
+                    setCustomQueryPrompt(
+                      customQuery +
+                        ", Give a 3 point answer which is short and exact."
+                    );
                     handleApiCall(customQuery, "customQuery");
                   }}
                   className="mt-4 bg-[#9333EA] hover:bg-[#7928CA] text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center gap-2"
@@ -567,6 +607,45 @@ function Page() {
                     <div className="prose prose-invert max-w-none">
                       <div className="text-gray-300 space-y-4">
                         <Markdown>{responses[key]}</Markdown>
+                        {key === "sentiments" && sentimentData.length > 0 && (
+                          <div className="h-[400px] w-full mt-8">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <PieChart>
+                                <Pie
+                                  data={sentimentData}
+                                  cx="50%"
+                                  cy="50%"
+                                  labelLine={false}
+                                  label={({
+                                    name,
+                                    percent,
+                                  }: {
+                                    name: string;
+                                    percent: number;
+                                  }) =>
+                                    `${name} ${(percent * 100).toFixed(0)}%`
+                                  }
+                                  outerRadius={150}
+                                  fill="#8884d8"
+                                  dataKey="value"
+                                >
+                                  {sentimentData.map((entry, index) => (
+                                    <Cell
+                                      key={`cell-${index}`}
+                                      fill={
+                                        SENTIMENT_COLORS[
+                                          entry.name as keyof typeof SENTIMENT_COLORS
+                                        ]
+                                      }
+                                    />
+                                  ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </div>
+                        )}
                         {key === "keywords" && (
                           <div className="flex flex-wrap h-[400px] w-full mt-8 border border-gray-800 rounded-xl p-1 overflow-y-auto">
                             {generateWordCloudData()
