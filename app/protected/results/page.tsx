@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import Markdown from "react-markdown";
 
-
 function Page() {
   const [painPoints, setPainPoints] = useState<string>("");
   const [triggers, setTriggers] = useState<string>("");
@@ -175,8 +174,161 @@ function Page() {
     { title: "📚 References", key: "references" },
   ];
 
-  // Add new function to generate word cloud data
- 
+  const generateWordCloudData = () => {
+    // Check if Tavily data exists
+    if (!tavilyData) {
+      return [];
+    }
+
+    // Combine all Tavily responses into one string
+    const allResponses = [
+      ...tavilyData.ctRdData?.map(
+        (item: any) => `${item.title} ${item.content}`
+      ),
+      ...tavilyData.rdData?.map((item: any) => `${item.title} ${item.content}`),
+      ...tavilyData.ytData?.map((item: any) => `${item.title} ${item.content}`),
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    // If no valid responses, return empty array
+    if (!allResponses) {
+      return [];
+    }
+
+    // Common words to exclude
+    const stopWords = new Set([
+      "the",
+      "be",
+      "to",
+      "of",
+      "and",
+      "a",
+      "in",
+      "that",
+      "have",
+      "i",
+      "it",
+      "for",
+      "not",
+      "on",
+      "with",
+      "he",
+      "as",
+      "you",
+      "do",
+      "at",
+      "this",
+      "but",
+      "his",
+      "by",
+      "from",
+      "they",
+      "we",
+      "say",
+      "her",
+      "she",
+      "or",
+      "an",
+      "will",
+      "my",
+      "one",
+      "all",
+      "would",
+      "there",
+      "their",
+      "what",
+      "so",
+      "up",
+      "out",
+      "if",
+      "about",
+      "who",
+      "get",
+      "which",
+      "go",
+      "me",
+      "when",
+      "make",
+      "can",
+      "like",
+      "time",
+      "no",
+      "just",
+      "him",
+      "know",
+      "take",
+      "people",
+      "into",
+      "year",
+      "your",
+      "good",
+      "some",
+      "could",
+      "them",
+      "see",
+      "other",
+      "than",
+      "then",
+      "now",
+      "look",
+      "only",
+      "come",
+      "its",
+      "over",
+      "think",
+      "also",
+      "back",
+      "after",
+      "use",
+      "two",
+      "how",
+      "our",
+      "work",
+      "first",
+      "well",
+      "way",
+      "even",
+      "new",
+      "want",
+      "because",
+      "any",
+      "these",
+      "give",
+      "day",
+      "most",
+      "us",
+    ]);
+
+    // Split into words, clean up, and filter
+    const words = allResponses
+      .toLowerCase()
+      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+      .split(/\s+/)
+      .filter(
+        (word) =>
+          word.length > 3 &&
+          !stopWords.has(word) &&
+          !word.includes("http") &&
+          !word.includes("www")
+      );
+
+    // Count word frequencies
+    const wordCount = words.reduce((acc: { [key: string]: number }, word) => {
+      acc[word] = (acc[word] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Format and sort by frequency
+    return Object.entries(wordCount)
+      .map(([text, value]) => ({
+        text,
+        value,
+        // Generate consistent colors based on word length
+        color: `hsl(${(text.length * 20) % 360}, 70%, 70%)`,
+      }))
+      .sort((a, b) => b.value - a.value);
+  };
 
   if (!formData) {
     return (
@@ -372,10 +524,29 @@ function Page() {
                     <div className="prose prose-invert max-w-none">
                       <div className="text-gray-300 space-y-4">
                         <Markdown>{responses[key]}</Markdown>
+                        {key === "keywords" && (
+                          <div className="flex flex-wrap h-[400px] w-full mt-8 border border-gray-800 rounded-xl p-1 overflow-y-auto">
+                            {generateWordCloudData()
+                              .slice(0, 40)
+                              .map((word, index) => (
+                                <div
+                                  key={word.text}
+                                  className={` p-2 ${
+                                    Math.random() > 0.5 ? "text-xl" : "text-3xl"
+                                  } ${
+                                    Math.random() > 0.5
+                                      ? "text-white"
+                                      : "text-primary"
+                                  }`}
+                                >
+                                  {word.text}
+                                </div>
+                              ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
-                  
                 </div>
               ))
           )}
