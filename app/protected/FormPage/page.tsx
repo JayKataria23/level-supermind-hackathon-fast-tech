@@ -2,12 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Plus, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
-import {
-  useForm,
-  FormProvider,
-  SubmitHandler,
-  FieldValues,
-} from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useForm, FormProvider } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,25 +16,41 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { DashboardSkeleton } from "@/components/loading-skeleton";
 import {
   FormControl,
   FormDescription,
+  FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 
+interface FormData {
+  companyName: string;
+  companyDescription: string;
+  targetAge: string;
+  targetGender: string;
+  targetCountry: string;
+}
+
 export default function CompanyDashboard() {
+  const router = useRouter();
   const [industries, setIndustries] = useState<string[]>([]);
   const [currentIndustry, setCurrentIndustry] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
-  const [formSuccess, setFormSuccess] = useState(false);
 
-  const methods = useForm();
+  const form = useForm<FormData>({
+    defaultValues: {
+      companyName: "",
+      companyDescription: "",
+      targetAge: "",
+      targetGender: "",
+      targetCountry: "",
+    },
+  });
 
   // Simulate initial data loading
   useEffect(() => {
@@ -60,9 +72,24 @@ export default function CompanyDashboard() {
     setIndustries(industries.filter((i) => i !== industry));
   };
 
-  const handleSubmit: SubmitHandler<FieldValues> = async (data) => {
-    // Handle form submission
-    console.log(data);
+  const onSubmit = async (data: FormData) => {
+    setIsLoading(true);
+    try {
+      // Combine form data with industries
+      const formData = {
+        ...data,
+        industries: industries,
+      };
+
+      // Redirect to results page with form data
+      router.push(
+        `/protected/results?data=${encodeURIComponent(JSON.stringify(formData))}`
+      );
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isPageLoading) {
@@ -82,10 +109,8 @@ export default function CompanyDashboard() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto space-y-8">
-          {/* Welcome Section */}
           <div className="space-y-2">
             <h2 className="text-4xl font-bold">Welcome to ART Finder!</h2>
             <p className="text-gray-400">
@@ -94,7 +119,6 @@ export default function CompanyDashboard() {
             </p>
           </div>
 
-          {/* Form Section */}
           <Card className="bg-gray-900 border-purple-900">
             <CardContent className="p-6">
               <div className="space-y-6">
@@ -108,38 +132,35 @@ export default function CompanyDashboard() {
                   </p>
                 </div>
 
-                {formSuccess && (
-                  <Alert className="bg-green-900/50 border-green-500 text-green-100">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    <AlertDescription>
-                      Your company profile has been updated successfully!
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <FormProvider {...methods}>
+                <FormProvider {...form}>
                   <form
-                    onSubmit={methods.handleSubmit(handleSubmit)}
+                    onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-6"
                   >
                     <div className="space-y-4">
-                      <FormItem>
-                        <FormLabel>
-                          Company Name <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...methods.register("companyName", {
-                              required: true,
-                            })}
-                            className="bg-gray-800 border-purple-900"
-                            placeholder="Enter your company name"
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          This will be displayed on your public profile
-                        </FormDescription>
-                      </FormItem>
+                      <FormField
+                        control={form.control}
+                        name="companyName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Company Name{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                className="bg-gray-800 border-purple-900"
+                                placeholder="Enter your company name"
+                                required
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              This will be displayed on your public profile
+                            </FormDescription>
+                          </FormItem>
+                        )}
+                      />
 
                       <FormItem>
                         <FormLabel>
@@ -189,70 +210,108 @@ export default function CompanyDashboard() {
                         )}
                       </FormItem>
 
-                      <FormItem>
-                        <FormLabel>
-                          Company Description{" "}
-                          <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            required
-                            className="bg-gray-800 border-purple-900 min-h-[120px]"
-                            placeholder="Describe your company and its main activities"
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Provide a clear description to help us understand your
-                          business better
-                        </FormDescription>
-                      </FormItem>
+                      <FormField
+                        control={form.control}
+                        name="companyDescription"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Company Description{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Textarea
+                                {...field}
+                                className="bg-gray-800 border-purple-900 min-h-[120px]"
+                                placeholder="Describe your company and its main activities"
+                                required
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Provide a clear description to help us understand
+                              your business better
+                            </FormDescription>
+                          </FormItem>
+                        )}
+                      />
 
                       <div className="grid md:grid-cols-3 gap-6">
-                        <FormItem>
-                          <FormLabel>Target Audience Age</FormLabel>
-                          <Select>
-                            <SelectTrigger className="bg-gray-800 border-purple-900">
-                              <SelectValue placeholder="Select age range" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="13-17">13-17</SelectItem>
-                              <SelectItem value="18-24">18-24</SelectItem>
-                              <SelectItem value="25-34">25-34</SelectItem>
-                              <SelectItem value="35-44">35-44</SelectItem>
-                              <SelectItem value="45+">45+</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
+                        <FormField
+                          control={form.control}
+                          name="targetAge"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Target Audience Age</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger className="bg-gray-800 border-purple-900">
+                                  <SelectValue placeholder="Select age range" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="13-17">13-17</SelectItem>
+                                  <SelectItem value="18-24">18-24</SelectItem>
+                                  <SelectItem value="25-34">25-34</SelectItem>
+                                  <SelectItem value="35-44">35-44</SelectItem>
+                                  <SelectItem value="45+">45+</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormItem>
+                          )}
+                        />
 
-                        <FormItem>
-                          <FormLabel>Target Gender</FormLabel>
-                          <Select>
-                            <SelectTrigger className="bg-gray-800 border-purple-900">
-                              <SelectValue placeholder="Select gender" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All</SelectItem>
-                              <SelectItem value="male">Male</SelectItem>
-                              <SelectItem value="female">Female</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
+                        <FormField
+                          control={form.control}
+                          name="targetGender"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Target Gender</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger className="bg-gray-800 border-purple-900">
+                                  <SelectValue placeholder="Select gender" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="all">All</SelectItem>
+                                  <SelectItem value="male">Male</SelectItem>
+                                  <SelectItem value="female">Female</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormItem>
+                          )}
+                        />
 
-                        <FormItem>
-                          <FormLabel>Target Country</FormLabel>
-                          <Select>
-                            <SelectTrigger className="bg-gray-800 border-purple-900">
-                              <SelectValue placeholder="Select country" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="us">United States</SelectItem>
-                              <SelectItem value="in">India</SelectItem>
-                              <SelectItem value="uk">United Kingdom</SelectItem>
-                              <SelectItem value="ca">Canada</SelectItem>
-                              <SelectItem value="au">Australia</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
+                        <FormField
+                          control={form.control}
+                          name="targetCountry"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Target Country</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger className="bg-gray-800 border-purple-900">
+                                  <SelectValue placeholder="Select country" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="us">
+                                    United States
+                                  </SelectItem>
+                                  <SelectItem value="in">India</SelectItem>
+                                  <SelectItem value="uk">
+                                    United Kingdom
+                                  </SelectItem>
+                                  <SelectItem value="ca">Canada</SelectItem>
+                                  <SelectItem value="au">Australia</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormItem>
+                          )}
+                        />
                       </div>
                     </div>
 
