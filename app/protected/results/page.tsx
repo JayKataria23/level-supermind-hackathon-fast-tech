@@ -36,7 +36,6 @@ function Page() {
   // Add these constants for the pie chart
   const SENTIMENT_COLORS = {
     Positive: "#4CAF50",
-    Neutral: "#FFC107",
     Negative: "#F44336",
   };
 
@@ -104,14 +103,15 @@ function Page() {
     if (
       selectedSection &&
       !responses[selectedSection] &&
-      !loading[selectedSection]
+      !loading[selectedSection] &&
+      tavilyData
     ) {
       const section = sections.find((s) => s.key === selectedSection);
       if (section && section.prompt) {
         handleApiCall(section.prompt, section.key);
       }
     }
-  }, [selectedSection, responses, loading]);
+  }, [selectedSection, responses, loading, tavilyData]);
 
   const handleApiCall = async (prompt: string, key: string) => {
     setLoading((prev) => ({ ...prev, [key]: true }));
