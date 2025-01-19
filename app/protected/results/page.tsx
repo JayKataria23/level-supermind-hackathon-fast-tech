@@ -339,7 +339,7 @@ function Page() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#0F0A1F] text-white">
+    <div className="flex min-h-screen text-white">
       {/* Sidebar */}
       <div className="w-72 border-r border-gray-800 p-4">
         {sections.map(({ title, key }) => (
